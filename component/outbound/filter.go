@@ -38,6 +38,14 @@ type DialerSet struct {
 	nodeToTagMap map[*dialer.Dialer]string
 }
 
+func (s *DialerSet) Add(d *dialer.Dialer, subscriptionTag string) {
+	if d == nil {
+		return
+	}
+	s.dialers = append(s.dialers, d)
+	s.nodeToTagMap[d] = subscriptionTag
+}
+
 func NewDialerSetFromLinks(option *dialer.GlobalOption, tagToNodeList map[string][]string) *DialerSet {
 	return NewDialerSetFromLinksContext(context.Background(), option, tagToNodeList)
 }
