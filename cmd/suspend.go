@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package cmd
@@ -32,12 +32,12 @@ var (
 			}
 			pid, err := strconv.Atoi(args[0])
 			if err != nil {
-				cmd.Help()
+				_ = cmd.Help()
 				os.Exit(1)
 			}
 			if abort {
 				if f, err := os.Create(AbortFile); err == nil {
-					f.Close()
+					_ = f.Close()
 				}
 			}
 			if err = syscall.Kill(pid, syscall.SIGUSR2); err != nil {

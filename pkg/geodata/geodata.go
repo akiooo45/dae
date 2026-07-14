@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 // Modified from https://github.com/v2fly/v2ray-core/blob/42b166760b2ba8d984e514b830fcd44e23728e43/infra/conf/geodata/memconservative
@@ -68,7 +68,7 @@ func UnmarshalGeoSite(log *logrus.Logger, filepath, code string) (*GeoSite, erro
 
 	case errFailedToReadBytes, errFailedToReadExpectedLenBytes,
 		errInvalidGeodataFile, errInvalidGeodataVarintLength:
-		log.Warnln("failed to decode geoip file: ", filepath, ", fallback to the original ReadFile method")
+		log.Warnln("failed to decode geosite file: ", filepath, ", fallback to the original ReadFile method")
 		geositeBytes, err = os.ReadFile(filepath)
 		if err != nil {
 			return nil, err

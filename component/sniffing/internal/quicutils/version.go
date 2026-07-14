@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package quicutils
@@ -19,9 +19,12 @@ func ParseVersion(version uint32) (Version, error) {
 	switch version {
 	case 0x6b3343cf:
 		return Version_V2, nil
-	case 1:
+	case 1, 0x51303530:
 		return Version_V1, nil
 	default:
+		if (version & 0x0f0f0f0f) == 0x0a0a0a0a {
+			return Version_V1, nil
+		}
 		if (version & 0xff000000) == 0xff000000 {
 			return Version_Draft, nil
 		}
@@ -76,5 +79,14 @@ func (v Version) IvLabel() []byte {
 		return []byte("quicv2 iv")
 	default:
 		panic("unsupported quic version")
+	}
+}
+
+func (v Version) InitialSecretLabel() []byte {
+	switch v {
+	case Version_V2:
+		return []byte("quicv2 client in")
+	default:
+		return []byte("client in")
 	}
 }

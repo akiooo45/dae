@@ -1,14 +1,14 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package config
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
 )
 
@@ -17,7 +17,16 @@ func TestMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	merger := NewMerger(abs)
+	raw, err := os.ReadFile(abs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpDir := t.TempDir()
+	tmpInput := filepath.Join(tmpDir, "example.dae")
+	if err = os.WriteFile(tmpInput, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	merger := NewMerger(tmpInput)
 	sections, _, err := merger.Merge()
 	if err != nil {
 		t.Fatal(err)
@@ -32,10 +41,11 @@ func TestMarshal(t *testing.T) {
 	}
 	t.Log(string(b))
 	// Read it again.
-	if err = os.WriteFile("/tmp/test.dae", b, 0640); err != nil {
+	tmpOutput := filepath.Join(tmpDir, "test.dae")
+	if err = os.WriteFile(tmpOutput, b, 0600); err != nil {
 		t.Fatal(err)
 	}
-	sections, _, err = NewMerger("/tmp/test.dae").Merge()
+	sections, _, err = NewMerger(tmpOutput).Merge()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,8 +53,12 @@ func TestMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	b2, err := conf2.Marshal(2)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	if !reflect.DeepEqual(conf1, conf2) {
-		t.Fatal("not equal")
+	if !bytes.Equal(b, b2) {
+		t.Fatalf("marshal should be idempotent after one round-trip\nfirst:\n%s\nsecond:\n%s", string(b), string(b2))
 	}
 }

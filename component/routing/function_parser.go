@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package routing
@@ -125,7 +125,11 @@ func parsePrefixes(values []string) (cidrs []netip.Prefix, err error) {
 	for _, value := range values {
 		toParse := value
 		if strings.LastIndexByte(value, '/') == -1 {
-			toParse += "/32"
+			if strings.Contains(value, ":") {
+				toParse += "/128"
+			} else {
+				toParse += "/32"
+			}
 		}
 		prefix, err := netip.ParsePrefix(toParse)
 		if err != nil {

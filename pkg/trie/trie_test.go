@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package trie
@@ -99,28 +99,28 @@ func TestTrie(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !(trie.HasPrefix("nc.tset^") == true) {
+	if trie.HasPrefix("nc.tset^") != true {
 		t.Fatal("^test.cn")
 	}
-	if !(trie.HasPrefix("nc^") == false) {
+	if trie.HasPrefix("nc^") != false {
 		t.Fatal("^cn")
 	}
-	if !(trie.HasPrefix("nc.") == true) {
+	if trie.HasPrefix("nc.") != true {
 		t.Fatal(".cn")
 	}
-	if !(trie.HasPrefix("nc.^") == true) {
+	if trie.HasPrefix("nc.^") != true {
 		t.Fatal("^.cn")
 	}
-	if !(trie.HasPrefix("nc._") == true) {
+	if trie.HasPrefix("nc._") != true {
 		t.Fatal("_.cn")
 	}
-	if !(trie.HasPrefix("n") == false) {
+	if trie.HasPrefix("n") != false {
 		t.Fatal("n")
 	}
-	if !(trie.HasPrefix("n^") == false) {
+	if trie.HasPrefix("n^") != false {
 		t.Fatal("^n")
 	}
-	if !(trie.HasPrefix("moc.cbatnetnoc^") == true) {
+	if trie.HasPrefix("moc.cbatnetnoc^") != true {
 		t.Fatal("contentabc.com")
 	}
 }

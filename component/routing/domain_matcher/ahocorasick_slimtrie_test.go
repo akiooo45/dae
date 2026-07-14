@@ -1,12 +1,13 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package domain_matcher
 
 import (
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/daeuniverse/dae/common/consts"
@@ -19,6 +20,9 @@ func TestAhocorasickSlimtrie(t *testing.T) {
 	logrus.SetLevel(logrus.TraceLevel)
 	simulatedDomainSet, err := getDomain()
 	if err != nil {
+		if strings.Contains(err.Error(), "geosite.dat: file does not exist") {
+			t.Skipf("skip due to missing geosite.dat in test environment: %v", err)
+		}
 		t.Fatal(err)
 	}
 	bf := NewBruteforce(consts.MaxMatchSetLen)
@@ -34,20 +38,20 @@ func TestAhocorasickSlimtrie(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rand.Seed(200)
-	for i := 0; i < 10000; i++ {
-		sample := TestSample[rand.Intn(len(TestSample))]
-		choice := rand.Intn(10)
+	r := rand.New(rand.NewSource(200))
+	for i := range 10000 {
+		sample := TestSample[r.Intn(len(TestSample))]
+		choice := r.Intn(10)
 		switch {
 		case choice < 4:
-			addN := rand.Intn(5)
+			addN := r.Intn(5)
 			buf := make([]byte, addN)
 			for i := range buf {
-				buf[i] = 'a' + byte(rand.Intn('z'-'a'))
+				buf[i] = 'a' + byte(r.Intn('z'-'a'))
 			}
 			sample = string(buf) + "." + sample
 		case choice >= 4 && choice < 6:
-			k := rand.Intn(len(sample))
+			k := r.Intn(len(sample))
 			sample = sample[k:]
 		default:
 		}

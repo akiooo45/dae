@@ -1,6 +1,6 @@
 /*
 *  SPDX-License-Identifier: AGPL-3.0-only
-*  Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+*  Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package dialer
@@ -12,12 +12,12 @@ func showDuration(d time.Duration) string {
 }
 
 func latencyString(realLatency, latencyOffset time.Duration) string {
-	var offsetSign string = "+"
+	var offsetSign = "+"
 	if latencyOffset < 0 {
 		offsetSign = "-"
 	}
 
-	var offsetPart string = ""
+	var offsetPart = ""
 	if latencyOffset != 0 {
 		offsetPart = "(" + offsetSign + showDuration(latencyOffset.Abs()) + "=" + showDuration(realLatency+latencyOffset) + ")"
 	}

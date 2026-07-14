@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package quicutils
@@ -14,7 +14,7 @@ func BigEndianUvarint(buf []byte) (uint64, int, error) {
 		return 0, 0, io.ErrUnexpectedEOF
 	}
 	length := 1 << (buf[0] >> 6)
-	if length == 0 {
+	if len(buf) < length {
 		return 0, 0, io.ErrUnexpectedEOF
 	}
 	x := uint64(buf[0] & 0x3f)

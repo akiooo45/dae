@@ -37,6 +37,17 @@ jobs:
             goarch: amd64
             goamd64: v3
           # END Linux AMD64 v1 v2 v3
+          # BEGIN Linux RISCV64 rva20u64 rva22u64 rva23u64
+          - goos: linux
+            goarch: riscv64
+            goriscv64: rva20u64
+          - goos: linux
+            goarch: riscv64
+            goriscv64: rva22u64
+          - goos: linux
+            goarch: riscv64
+            goriscv64: rva23u64
+          # END Linux RISCV64 rva20u64 rva22u64 rva23u64
       fail-fast: false
 
     runs-on: ubuntu-22.04
@@ -45,11 +56,12 @@ jobs:
       GOARCH: ${{ matrix.goarch }}
       GOARM: ${{ matrix.goarm }}
       GOAMD64: ${{ matrix.goamd64 }}
+      GORISCV64: ${{ matrix.goriscv64 }}
       CGO_ENABLED: 0
 
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ inputs.tag }}
@@ -71,13 +83,20 @@ jobs:
           echo "ASSET_NAME=$_NAME" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Go 1.26
+        uses: actions/setup-go@v6
         with:
-          cache-dependency-path: |
-            go.mod
-            go.sum          
-          go-version: '^1.22'
+          go-version: 1.26
+
+      - name: Go cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Install Dependencies
         run: |
@@ -104,6 +123,8 @@ jobs:
         run: |
           export CGO_ENABLED=0
           export GOFLAGS="-trimpath -modcacherw"
+          # Go 1.26 optimization: newinliner, simd, heapminimum512kib, and randomizedheapbase64.
+          export GOEXPERIMENT="newinliner,simd,heapminimum512kib,randomizedheapbase64"
           export OUTPUT=pkgdir/usr/bin/dae
           export VERSION=${{ env.VERSION }}
           export CLANG=clang-15

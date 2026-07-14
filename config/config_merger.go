@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * Copyright (c) 2022-2025, daeuniverse Organization <dae@v2raya.org>
+ * Copyright (c) 2022-2026, daeuniverse Organization <dae@v2raya.org>
  */
 
 package config
@@ -66,6 +66,7 @@ func (m *Merger) readEntry(entry string) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to read config file %v: %w", entry, err)
 	}
+	defer func() { _ = f.Close() }()
 	// Check file access.
 	fi, err := f.Stat()
 	if err != nil {
@@ -134,7 +135,11 @@ func (m *Merger) dfsMerge(entry string, fatherEntry string) (err error) {
 		switch v := include.Value.(type) {
 		case *config_parser.Param:
 			nextEntry := v.String(true, false)
-			patterEntries = append(patterEntries, filepath.Join(m.entryDir, nextEntry))
+			if filepath.IsAbs(nextEntry) {
+				patterEntries = append(patterEntries, nextEntry)
+			} else {
+				patterEntries = append(patterEntries, filepath.Join(m.entryDir, nextEntry))
+			}
 		default:
 			return fmt.Errorf("unsupported include grammar in %v: %v", entry, include.String(false, false))
 		}
