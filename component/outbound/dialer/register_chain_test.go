@@ -48,7 +48,11 @@ func TestNewNetproxyDialerFromLinkBuildsEntryThenExit(t *testing.T) {
 	if !ok || exit.name != "dae-test-exit" {
 		t.Fatalf("outer dialer = %#v, want exit", got)
 	}
-	entry, ok := exit.next.(*chainOrderTestDialer)
+	adapter, ok := exit.next.(*netConnDialer)
+	if !ok {
+		t.Fatalf("exit next = %#v, want net.Conn adapter", exit.next)
+	}
+	entry, ok := adapter.Dialer.(*chainOrderTestDialer)
 	if !ok || entry.name != "dae-test-entry" || entry.next != base {
 		t.Fatalf("exit next = %#v, want entry over base", exit.next)
 	}

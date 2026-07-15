@@ -56,7 +56,7 @@ func newGroupChainNetproxyDialer(option *dialer.GlobalOption, entry *DialerGroup
 	}
 	var exitProperty *D.Property
 	for _, entryDialer := range entry.Dialers {
-		exit, property, err := D.NewNetproxyDialerFromLink(entryDialer, &option.ExtraOption, spec.ExitLink)
+		exit, property, err := D.NewNetproxyDialerFromLink(dialer.EnsureNetConn(entryDialer), &option.ExtraOption, spec.ExitLink)
 		if err != nil {
 			_ = c.Close()
 			return nil, nil, fmt.Errorf("create group chain %q exit: %w", spec.Name, err)

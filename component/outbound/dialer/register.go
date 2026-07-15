@@ -135,7 +135,7 @@ func newNetproxyDialerFromLink(base netproxy.Dialer, option *D.ExtraOption, link
 	if err != nil {
 		return nil, nil, fmt.Errorf("create entry node: %w", err)
 	}
-	exit, exitProperty, err := D.NewNetproxyDialerFromLink(entry, option, chain.ExitLink)
+	exit, exitProperty, err := D.NewNetproxyDialerFromLink(EnsureNetConn(entry), option, chain.ExitLink)
 	if err != nil {
 		return nil, nil, fmt.Errorf("create exit node: %w", err)
 	}
