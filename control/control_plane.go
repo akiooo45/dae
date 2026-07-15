@@ -1231,6 +1231,10 @@ func (c *ControlPlane) InheritDialerHealthFrom(previous *ControlPlane) bool {
 				continue
 			}
 			if oldDialer := oldDialers[d.Property().Name]; oldDialer != nil {
+				if _, isChain, _ := common.ParseProxyChain(d.Property().Link); isChain &&
+					d.Property().Link != oldDialer.Property().Link {
+					continue
+				}
 				d.RestoreHealthSnapshot(oldDialer.ReloadHealthSnapshot())
 				outbound.RestoreGroupChainSelection(d.Dialer, oldDialer.Dialer)
 				hasOverlap = true

@@ -57,10 +57,13 @@ func NewDialerSetFromLinksContext(ctx context.Context, option *dialer.GlobalOpti
 		nodeToTagMap: make(map[*dialer.Dialer]string),
 	}
 	for subscriptionTag, nodes := range tagToNodeList {
-		for _, node := range nodes {
+		for nodeIndex, node := range nodes {
 			d, err := dialer.NewFromLinkContext(ctx, option, dialer.InstanceOption{DisableCheck: false}, node, subscriptionTag)
 			if err != nil {
-				s.log.Infof("failed to parse node: %v", err)
+				s.log.WithFields(logrus.Fields{
+					"subscription": subscriptionTag,
+					"node_index":   nodeIndex,
+				}).Error("failed to parse node")
 				continue
 			}
 			s.dialers = append(s.dialers, d)

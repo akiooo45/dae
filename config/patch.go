@@ -20,7 +20,7 @@ type patch func(params *Config) error
 var patches = []patch{
 	patchBootstrapResolver,
 	patchTcpCheckHttpMethod,
-	patchGroupChains,
+	patchProxyChains,
 	patchEmptyDns,
 	patchMustOutbound,
 }
@@ -38,15 +38,19 @@ func patchTcpCheckHttpMethod(params *Config) error {
 	return nil
 }
 
-func patchGroupChains(params *Config) error {
+func patchProxyChains(params *Config) error {
 	groups := make(map[string]struct{}, len(params.Group))
 	for _, group := range params.Group {
 		groups[group.Name] = struct{}{}
 	}
 	for _, node := range params.Node {
+		name, _ := common.GetTagFromLinkLikePlaintext(string(node))
+		if _, _, err := common.ParseProxyChain(string(node)); err != nil {
+			return fmt.Errorf("proxy chain %q: %w", name, err)
+		}
 		chain, matched, err := common.ParseGroupChain(string(node))
 		if err != nil {
-			return err
+			return fmt.Errorf("proxy chain %q: %w", name, err)
 		}
 		if !matched {
 			continue

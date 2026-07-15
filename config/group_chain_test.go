@@ -53,7 +53,17 @@ func TestConfigRejectsNestedGroupChain(t *testing.T) {
 		`bad: 'group(HK) -> vmess://middle -> vmess://exit'`,
 		`HK { policy: min }`,
 	)
-	if err == nil || !strings.Contains(err.Error(), "must have the form") {
+	if err == nil || !strings.Contains(err.Error(), "exactly two nodes") {
 		t.Fatalf("err = %v, want group chain shape error", err)
+	}
+}
+
+func TestConfigRejectsThreeNodeChain(t *testing.T) {
+	err := parseGroupChainConfig(t,
+		`bad: 'tuic://entry -> vmess://middle -> vless://exit'`,
+		`HK { policy: min }`,
+	)
+	if err == nil || !strings.Contains(err.Error(), "exactly two nodes") {
+		t.Fatalf("err = %v, want two-node chain error", err)
 	}
 }

@@ -32,7 +32,7 @@ func ParseGroupChain(link string) (*GroupChain, bool, error) {
 			continue
 		}
 		if !strings.HasSuffix(part, ")") {
-			return nil, true, fmt.Errorf("invalid group chain entry %q", part)
+			return nil, true, fmt.Errorf("invalid group chain entry syntax")
 		}
 		groupAt = i
 		groupName = strings.TrimSpace(part[len("group(") : len(part)-1])
@@ -41,16 +41,20 @@ func ParseGroupChain(link string) (*GroupChain, bool, error) {
 	if groupAt < 0 {
 		return nil, false, nil
 	}
-	if len(parts) != 2 || groupAt != 0 {
+	chain, matched, err := ParseProxyChain(link)
+	if err != nil {
+		return nil, true, err
+	}
+	if !matched {
+		return nil, true, fmt.Errorf("group chain must have the form group(NAME) -> node")
+	}
+	if groupAt != 0 {
 		return nil, true, fmt.Errorf("group chain must have the form group(NAME) -> node")
 	}
 	if groupName == "" {
 		return nil, true, fmt.Errorf("group chain entry name is empty")
 	}
-	exitLink := strings.TrimSpace(parts[1])
-	if exitLink == "" {
-		return nil, true, fmt.Errorf("group chain exit node is empty")
-	}
+	exitLink := chain.ExitLink
 	if strings.HasPrefix(exitLink, "group(") {
 		return nil, true, fmt.Errorf("group chain exit must be a concrete node")
 	}
