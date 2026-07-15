@@ -57,8 +57,8 @@ func TestEnsureNetConn(t *testing.T) {
 
 func TestEnsureNetConnKeepsStandardConn(t *testing.T) {
 	raw, peer := net.Pipe()
-	defer raw.Close()
-	defer peer.Close()
+	defer func() { _ = raw.Close() }()
+	defer func() { _ = peer.Close() }()
 	conn, err := EnsureNetConn(netConnTestDialer{conn: raw}).DialContext(context.Background(), "tcp", "example.com:443")
 	if err != nil {
 		t.Fatal(err)
